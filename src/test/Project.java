@@ -14,8 +14,9 @@ import java.util.ArrayList;
 public class Project {
 
     public String name;
-    public int testInt;
-    ArrayList<Page> pages;
+    public Integer count;
+    public Float price;
+    public ArrayList<Page> pages;
 
     /**
      * @return the name

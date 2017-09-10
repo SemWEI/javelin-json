@@ -16,6 +16,7 @@ public class JavelinJSON {
      */
     public static void main(String[] args) {
         System.out.println("=====================Javelin JSON parser=====================");
+        test.Tester.main(args);
     }
     
 }

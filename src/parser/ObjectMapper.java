@@ -5,6 +5,7 @@
  */
 package parser;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,8 @@ public class ObjectMapper {
     public static final int STRICT_MODEL = 3;
     public static final int NONE = 0;
 
-    public static Object mapJSONtoObjects(String json, Object objectToMapTo) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    public static Object mapJSONtoObjects(String json, Object objectToMapTo) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+        json = json.substring(1, json.length() - 1);
         StringTokenizer defaultTokenizer = new StringTokenizer(json, ",");
         StringTokenizer defaultTokenizer2;
 
@@ -38,12 +40,18 @@ public class ObjectMapper {
             if (m.find()) {
                 fieldName = (String) m.group().subSequence(1, m.group().length() - 1);
             }
-
-            m = p.matcher(defaultTokenizer2.nextToken());
+            String valueString = defaultTokenizer2.nextToken();
+            m = p.matcher(valueString);
             if (m.find()) {
                 value = (String) m.group().subSequence(1, m.group().length() - 1);
+                objectToMapTo.getClass().getDeclaredField(fieldName).set(objectToMapTo, value);
+            } else { // value is not a String
+                //check if numeric object or boolean
+                valueString = valueString.trim();
+                Class c = objectToMapTo.getClass().getDeclaredField(fieldName).getType();
+                objectToMapTo.getClass().getDeclaredField(fieldName).set(objectToMapTo, c.getConstructor(new Class[]{String.class}).newInstance(valueString));
             }
-            objectToMapTo.getClass().getDeclaredField(fieldName).set(objectToMapTo, value);
+            
 
         }
         return objectToMapTo;
